@@ -41,5 +41,7 @@ Run the program with the input file and specify the number of threads:
 ## Example Output
 
 Using 4 threads.
+
 Largest sequence: 24846080177092
+
 Execution Time: 102 ms
