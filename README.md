@@ -18,14 +18,18 @@ The input file should be a plain text file where each line contains a numeric va
 ## Compilation
 1. Clone the repository:
    
-   git clone https://github.com/D13mitriy/parallel_puzzle.git "\n"
+   git clone https://github.com/D13mitriy/parallel_puzzle.git
+   
    cd parallel_puzzle
 
-2. Create a build directory and compile the program:
+3. Create a build directory and compile the program:
 
 mkdir build
+
 cd build
+
 cmake ..
+
 cmake --build .
 
 ## Usage
