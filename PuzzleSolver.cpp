@@ -25,6 +25,20 @@ std::vector<int> PuzzleSolver::parallelTopologicalSort(int numThreads) {
 
     auto processNode = [&](int node) {
         topoOrder.push_back(node);
+        if (graph.find(node) == graph.end()) {
+            std::cerr << "Warning: Node " << numbers[node] << " is disconnected.\n";
+            return;
+        }
+        for (int neighbor : graph.at(node)) {
+            if (--localInDegree[neighbor] == 0) {
+                std::lock_guard<std::mutex> lock(queueMutex);
+                zeroInDegreeQueue.push(neighbor);
+            }
+        }
+    };
+
+    /*auto processNode = [&](int node) {
+        topoOrder.push_back(node);
         try {
             for (int neighbor : graph.at(node)) { // Try accessing the node
                 if (--localInDegree[neighbor] == 0) {
@@ -35,7 +49,7 @@ std::vector<int> PuzzleSolver::parallelTopologicalSort(int numThreads) {
         } catch (const std::out_of_range& e) {
             std::cerr << "Error: Node " << node << " not found in graph.\n";
         }
-    };
+    };*/
 
     while (!zeroInDegreeQueue.empty()) {
         int current;

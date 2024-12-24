@@ -12,6 +12,43 @@ void GraphBuilder::addEdge(int from, int to) {
     graph[from].push_back(to);
     ++inDegree[to];
 }
+
+void GraphBuilder::buildGraph(const std::vector<std::string>& numbers, int numThreads) {
+    int n = numbers.size();
+    inDegree.resize(n, 0);
+
+    auto computeEdges = [&](int start, int end) {
+        for (int i = start; i < end; ++i) {
+            std::string endDigits = Utils::getLastTwoDigits(numbers[i]);
+            for (int j = 0; j < n; ++j) {
+                if (i != j && Utils::getFirstTwoDigits(numbers[j]) == endDigits) {
+                    addEdge(i, j);
+                    std::cout << "Edge added: " << numbers[i] << " -> " << numbers[j] << std::endl;
+                }
+            }
+        }
+    };
+
+    int chunkSize = (n + numThreads - 1) / numThreads;
+    std::vector<std::thread> threads;
+    for (int t = 0; t < numThreads; ++t) {
+        int start = t * chunkSize;
+        int end = std::min(n, start + chunkSize);
+        threads.emplace_back(computeEdges, start, end);
+    }
+
+    for (auto& thread : threads) thread.join();
+
+    // Log nodes with no outgoing edges
+    for (int i = 0; i < n; ++i) {
+        if (graph.find(i) == graph.end() || graph[i].empty()) {
+            std::cerr << "Warning: Node " << numbers[i] << " has no outgoing edges.\n";
+        }
+    }
+}
+
+
+/*
 void GraphBuilder::buildGraph(const std::vector<std::string>& numbers, int numThreads) {
     int n = numbers.size();
     inDegree.resize(n, 0);
@@ -44,7 +81,7 @@ void GraphBuilder::buildGraph(const std::vector<std::string>& numbers, int numTh
         }
     }
 }
-/*
+
 void GraphBuilder::buildGraph(const std::vector<std::string>& numbers, int numThreads) {
     int n = numbers.size();
     inDegree.resize(n, 0);
